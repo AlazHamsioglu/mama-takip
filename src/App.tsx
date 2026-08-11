@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import './App.css';
 
+import { FeedingForm } from './components/FeedingForm';
 import { TodayPage } from './pages/TodayPage';
 
 import type {
@@ -16,50 +17,102 @@ import {
   getPets,
   getSelectedPetId,
   initializeStorage,
+  saveFeedingRecords,
   saveSelectedPetId,
 } from './utils/storage';
 
 initializeStorage();
 
 function App() {
-  const [pets] = useState<Pet[]>(() => getPets());
+  const [pets] = useState<Pet[]>(() =>
+    getPets(),
+  );
 
-  const [foods] = useState<Food[]>(() => getFoods());
+  const [foods] = useState<Food[]>(() =>
+    getFoods(),
+  );
 
-  const [feedingRecords] = useState<FeedingRecord[]>(() =>
+  const [
+    feedingRecords,
+    setFeedingRecords,
+  ] = useState<FeedingRecord[]>(() =>
     getFeedingRecords(),
   );
 
-  const [selectedPetId, setSelectedPetId] = useState(() => {
+  const [
+    selectedPetId,
+    setSelectedPetId,
+  ] = useState(() => {
     const storedPets = getPets();
-    const storedSelectedPetId = getSelectedPetId();
+    const storedSelectedPetId =
+      getSelectedPetId();
 
     return (
       storedPets.find(
-        (pet) => pet.id === storedSelectedPetId,
+        (pet) =>
+          pet.id === storedSelectedPetId,
       )?.id ??
       storedPets[0]?.id ??
       ''
     );
   });
 
+  const [
+    isFeedingFormOpen,
+    setIsFeedingFormOpen,
+  ] = useState(false);
+
   function handleSelectPet(petId: string) {
     setSelectedPetId(petId);
     saveSelectedPetId(petId);
   }
 
+  function handleAddFeeding(
+    record: FeedingRecord,
+  ) {
+    const updatedRecords = [
+      ...feedingRecords,
+      record,
+    ];
+
+    setFeedingRecords(updatedRecords);
+    saveFeedingRecords(updatedRecords);
+
+    setSelectedPetId(record.petId);
+    saveSelectedPetId(record.petId);
+
+    setIsFeedingFormOpen(false);
+  }
+
   return (
-    <main className="app">
-      {selectedPetId && (
-        <TodayPage
+    <>
+      <main className="app">
+        {selectedPetId && (
+          <TodayPage
+            pets={pets}
+            foods={foods}
+            feedingRecords={feedingRecords}
+            selectedPetId={selectedPetId}
+            onSelectPet={handleSelectPet}
+            onAddFeeding={() =>
+              setIsFeedingFormOpen(true)
+            }
+          />
+        )}
+      </main>
+
+      {isFeedingFormOpen && (
+        <FeedingForm
           pets={pets}
           foods={foods}
-          feedingRecords={feedingRecords}
           selectedPetId={selectedPetId}
-          onSelectPet={handleSelectPet}
+          onSave={handleAddFeeding}
+          onCancel={() =>
+            setIsFeedingFormOpen(false)
+          }
         />
       )}
-    </main>
+    </>
   );
 }
 

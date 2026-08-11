@@ -21,6 +21,7 @@ interface TodayPageProps {
     feedingRecords: FeedingRecord[];
     selectedPetId: string;
     onSelectPet: (petId: string) => void;
+    onAddFeeding: () => void;
 }
 
 export function TodayPage({
@@ -29,6 +30,7 @@ export function TodayPage({
     feedingRecords,
     selectedPetId,
     onSelectPet,
+    onAddFeeding,
 }: TodayPageProps) {
     const selectedPet = pets.find(
         (pet) => pet.id === selectedPetId,
@@ -282,6 +284,7 @@ export function TodayPage({
             <button
                 type="button"
                 className="primary-action"
+                onClick={onAddFeeding}
             >
                 + Mama Verildi
             </button>
