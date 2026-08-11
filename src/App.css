@@ -197,7 +197,7 @@
 .primary-action {
   position: fixed;
   right: 20px;
-  bottom: 24px;
+  bottom: 84px;
   left: 20px;
   z-index: 10;
   max-width: 688px;
@@ -382,5 +382,132 @@
 @media (max-width: 420px) {
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  margin-bottom: 8px;
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+}
+
+.page-header p {
+  margin-bottom: 0;
+  color: #6f7a73;
+}
+
+.history-page {
+  width: min(100% - 32px, 720px);
+  margin: 0 auto;
+  padding: 24px 0 120px;
+}
+
+.history-pet-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-list .content-card {
+  margin-top: 0;
+}
+
+.history-day__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #edf0ed;
+}
+
+.history-day__header h2 {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+}
+
+.history-day__total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.history-day__total span {
+  color: #78827c;
+  font-size: 0.78rem;
+}
+
+.history-day__total strong {
+  color: #315c3e;
+}
+
+.feeding-item__content small {
+  color: #8a938d;
+  font-size: 0.78rem;
+}
+
+.bottom-navigation {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid #dde3de;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 -6px 24px rgb(31 41 51 / 6%);
+  backdrop-filter: blur(12px);
+}
+
+.bottom-navigation__item {
+  display: flex;
+  min-width: 0;
+  min-height: 68px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 4px;
+  border: 0;
+  background: transparent;
+  color: #768079;
+  font-size: 0.7rem;
+}
+
+.bottom-navigation__item--active {
+  color: #315c3e;
+  font-weight: 800;
+}
+
+.bottom-navigation__icon {
+  font-size: 1.15rem;
+}
+
+@media (min-width: 768px) {
+  .history-page {
+    padding-top: 40px;
+  }
+
+  .bottom-navigation {
+    right: 50%;
+    left: auto;
+    width: min(100%, 720px);
+    transform: translateX(50%);
+    border: 1px solid #dde3de;
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
   }
 }

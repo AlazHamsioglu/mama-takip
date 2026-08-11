@@ -12,3 +12,5 @@ export type {
 export type {
     FeedingRecord,
 } from './feeding';
+
+export type { AppPage } from './navigation';

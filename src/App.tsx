@@ -3,9 +3,16 @@ import { useState } from 'react';
 import './App.css';
 
 import { FeedingForm } from './components/FeedingForm';
+import { BottomNavigation } from './components/layout/BottomNavigation';
+
+import { HistoryPage } from './pages/HistoryPage';
 import { TodayPage } from './pages/TodayPage';
 
+import { FoodsPage } from './pages/FoodsPage';
+import { PetsPage } from './pages/PetsPage';
+
 import type {
+  AppPage,
   FeedingRecord,
   Food,
   Pet,
@@ -56,6 +63,9 @@ function App() {
       ''
     );
   });
+
+  const [activePage, setActivePage] =
+    useState<AppPage>('today');
 
   const [
     isFeedingFormOpen,
@@ -129,10 +139,29 @@ function App() {
     setIsFeedingFormOpen(false);
   }
 
-  return (
-    <>
-      <main className="app">
-        {selectedPetId && (
+  function renderPage() {
+    switch (activePage) {
+      case 'history':
+        return (
+          <HistoryPage
+            pets={pets}
+            foods={foods}
+            feedingRecords={feedingRecords}
+            selectedPetId={selectedPetId}
+            onSelectPet={handleSelectPet}
+            onEditFeeding={handleEditFeeding}
+          />
+        );
+
+      case 'pets':
+        return <PetsPage />;
+
+      case 'foods':
+        return <FoodsPage />;
+
+      case 'today':
+      default:
+        return (
           <TodayPage
             pets={pets}
             foods={foods}
@@ -142,8 +171,20 @@ function App() {
             onAddFeeding={handleOpenFeedingForm}
             onEditFeeding={handleEditFeeding}
           />
-        )}
+        );
+    }
+  }
+
+  return (
+    <>
+      <main className="app">
+        {selectedPetId && renderPage()}
       </main>
+
+      <BottomNavigation
+        activePage={activePage}
+        onNavigate={setActivePage}
+      />
 
       {isFeedingFormOpen && (
         <FeedingForm
