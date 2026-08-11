@@ -657,3 +657,27 @@
   color: #7d8781;
   font-size: 0.78rem;
 }
+
+.management-card__main--static {
+  cursor: default;
+}
+
+.used-badge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #f2eee5;
+  color: #765e36;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.form-field select:disabled {
+  cursor: not-allowed;
+  background: #f3f5f3;
+  color: #7a847e;
+}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import './App.css';
 
 import { FeedingForm } from './components/FeedingForm';
+import { FoodForm } from './components/FoodForm';
 import { PetForm } from './components/PetForm';
 import { BottomNavigation } from './components/layout/BottomNavigation';
 
@@ -26,6 +27,7 @@ import {
   getSelectedPetId,
   initializeStorage,
   saveFeedingRecords,
+  saveFoods,
   savePets,
   saveSelectedPetId,
 } from './utils/storage';
@@ -37,7 +39,7 @@ function App() {
     () => getPets(),
   );
 
-  const [foods] = useState<Food[]>(
+  const [foods, setFoods] = useState<Food[]>(
     () => getFoods(),
   );
 
@@ -88,6 +90,16 @@ function App() {
     editingPet,
     setEditingPet,
   ] = useState<Pet | null>(null);
+
+  const [
+    isFoodFormOpen,
+    setIsFoodFormOpen,
+  ] = useState(false);
+
+  const [
+    editingFood,
+    setEditingFood,
+  ] = useState<Food | null>(null);
 
   function handleSelectPet(petId: string) {
     setSelectedPetId(petId);
@@ -224,6 +236,61 @@ function App() {
     setIsPetFormOpen(false);
   }
 
+  function handleSaveFood(food: Food) {
+    const foodExists = foods.some(
+      (item) => item.id === food.id,
+    );
+
+    const updatedFoods = foodExists
+      ? foods.map((item) =>
+        item.id === food.id
+          ? food
+          : item,
+      )
+      : [...foods, food];
+
+    setFoods(updatedFoods);
+    saveFoods(updatedFoods);
+
+    setEditingFood(null);
+    setIsFoodFormOpen(false);
+  }
+
+  function handleDeleteFood(foodId: string) {
+    const isUsed = feedingRecords.some(
+      (record) => record.foodId === foodId,
+    );
+
+    if (isUsed) {
+      return;
+    }
+
+    const updatedFoods = foods.filter(
+      (food) => food.id !== foodId,
+    );
+
+    setFoods(updatedFoods);
+    saveFoods(updatedFoods);
+
+    setEditingFood(null);
+    setIsFoodFormOpen(false);
+  }
+
+  function handleOpenFoodForm() {
+    setEditingFood(null);
+    setIsFoodFormOpen(true);
+  }
+
+  function handleEditFood(food: Food) {
+    setEditingFood(food);
+    setIsFoodFormOpen(true);
+  }
+
+  function handleCloseFoodForm() {
+    setEditingFood(null);
+    setIsFoodFormOpen(false);
+  }
+
   function renderPage() {
     switch (activePage) {
       case 'history':
@@ -250,7 +317,14 @@ function App() {
         );
 
       case 'foods':
-        return <FoodsPage />;
+        return (
+          <FoodsPage
+            foods={foods}
+            feedingRecords={feedingRecords}
+            onAddFood={handleOpenFoodForm}
+            onEditFood={handleEditFood}
+          />
+        );
 
       case 'today':
       default:
@@ -272,6 +346,13 @@ function App() {
         );
     }
   }
+
+  const editingFoodIsUsed =
+    editingFood !== null &&
+    feedingRecords.some(
+      (record) =>
+        record.foodId === editingFood.id,
+    );
 
   return (
     <>
@@ -306,6 +387,18 @@ function App() {
           onSave={handleSavePet}
           onDelete={handleDeletePet}
           onCancel={handleClosePetForm}
+        />
+      )}
+
+      {isFoodFormOpen && (
+        <FoodForm
+          editingFood={
+            editingFood ?? undefined
+          }
+          isUsed={editingFoodIsUsed}
+          onSave={handleSaveFood}
+          onDelete={handleDeleteFood}
+          onCancel={handleCloseFoodForm}
         />
       )}
     </>
