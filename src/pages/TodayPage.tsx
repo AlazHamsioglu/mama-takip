@@ -23,7 +23,10 @@ interface TodayPageProps {
     selectedPetId: string;
     onSelectPet: (petId: string) => void;
     onAddFeeding: () => void;
-    onEditFeeding: (record: FeedingRecord) => void;
+    onEditFeeding: (
+        record: FeedingRecord,
+    ) => void;
+    onAddPet: () => void;
 }
 
 export function TodayPage({
@@ -34,6 +37,7 @@ export function TodayPage({
     onSelectPet,
     onAddFeeding,
     onEditFeeding,
+    onAddPet,
 }: TodayPageProps) {
     const selectedPet = pets.find(
         (pet) => pet.id === selectedPetId,
@@ -43,34 +47,43 @@ export function TodayPage({
         return (
             <section className="empty-state">
                 <h2>Henüz evcil hayvan yok</h2>
+
                 <p>
-                    Beslenme takibine başlamak için bir evcil
-                    hayvan ekle.
+                    Beslenme takibine başlamak için bir
+                    evcil hayvan ekle.
                 </p>
+
+                <button
+                    type="button"
+                    className="save-button inline-action"
+                    onClick={onAddPet}
+                >
+                    + Evcil Hayvan Ekle
+                </button>
             </section>
         );
     }
 
-    const todayRecords = getTodayFeedingRecords(
-        feedingRecords,
-        selectedPet.id,
-    );
+    const todayRecords =
+        getTodayFeedingRecords(
+            feedingRecords,
+            selectedPet.id,
+        );
 
     const consumedAmount =
         getTotalConsumed(todayRecords);
 
-    const sortedTodayRecords =
-        sortFeedingRecordsByOldest(todayRecords);
+    const remainingAmount =
+        getRemainingAmount(
+            selectedPet.dailyTarget,
+            consumedAmount,
+        );
 
-    const remainingAmount = getRemainingAmount(
-        selectedPet.dailyTarget,
-        consumedAmount,
-    );
-
-    const exceededAmount = getExceededAmount(
-        selectedPet.dailyTarget,
-        consumedAmount,
-    );
+    const exceededAmount =
+        getExceededAmount(
+            selectedPet.dailyTarget,
+            consumedAmount,
+        );
 
     const progressPercentage =
         getProgressPercentage(
@@ -83,13 +96,33 @@ export function TodayPage({
         100,
     );
 
-    const lastFeeding = getLastFeedingRecord(
-        feedingRecords,
-        selectedPet.id,
-    );
+    const lastFeeding =
+        getLastFeedingRecord(
+            feedingRecords,
+            selectedPet.id,
+        );
 
     const getFood = (foodId: string) =>
-        foods.find((food) => food.id === foodId);
+        foods.find(
+            (food) => food.id === foodId,
+        );
+
+    const sortedTodayRecords =
+        sortFeedingRecordsByOldest(
+            todayRecords,
+        );
+
+    function getPetIcon(pet: Pet) {
+        if (pet.type === 'cat') {
+            return '🐱';
+        }
+
+        if (pet.type === 'dog') {
+            return '🐶';
+        }
+
+        return '🐾';
+    }
 
     return (
         <section className="today-page">
@@ -109,14 +142,12 @@ export function TodayPage({
                                         ? 'pet-chip pet-chip--active'
                                         : 'pet-chip'
                                 }
-                                onClick={() => onSelectPet(pet.id)}
+                                onClick={() =>
+                                    onSelectPet(pet.id)
+                                }
                             >
                                 <span>
-                                    {pet.type === 'cat'
-                                        ? '🐱'
-                                        : pet.type === 'dog'
-                                            ? '🐶'
-                                            : '🐾'}
+                                    {getPetIcon(pet)}
                                 </span>
 
                                 {pet.name}
@@ -129,6 +160,7 @@ export function TodayPage({
                     type="button"
                     className="add-pet-button"
                     aria-label="Evcil hayvan ekle"
+                    onClick={onAddPet}
                 >
                     +
                 </button>
@@ -140,18 +172,16 @@ export function TodayPage({
                 </span>
 
                 <h1>
-                    {selectedPet.type === 'cat'
-                        ? '🐱'
-                        : selectedPet.type === 'dog'
-                            ? '🐶'
-                            : '🐾'}{' '}
+                    {getPetIcon(selectedPet)}{' '}
                     {selectedPet.name}
                 </h1>
             </header>
 
             <article className="summary-card">
                 <div className="summary-card__amount">
-                    <strong>{consumedAmount}</strong>
+                    <strong>
+                        {consumedAmount}
+                    </strong>
 
                     <span>
                         / {selectedPet.dailyTarget}{' '}
@@ -204,7 +234,9 @@ export function TodayPage({
                 {lastFeeding ? (
                     <div className="last-feeding">
                         <div className="last-feeding__time">
-                            {formatTime(lastFeeding.dateTime)}
+                            {formatTime(
+                                lastFeeding.dateTime,
+                            )}
                         </div>
 
                         <div>
@@ -214,8 +246,10 @@ export function TodayPage({
                             </strong>
 
                             <p>
-                                {getFood(lastFeeding.foodId)
-                                    ?.name ?? 'Bilinmeyen mama'}
+                                {getFood(
+                                    lastFeeding.foodId,
+                                )?.name ??
+                                    'Bilinmeyen mama'}
                             </p>
                         </div>
                     </div>
@@ -233,55 +267,74 @@ export function TodayPage({
                             Bugün
                         </span>
 
-                        <h2>Bugünkü Öğünler</h2>
+                        <h2>
+                            Bugünkü Öğünler
+                        </h2>
                     </div>
                 </div>
 
-                {sortedTodayRecords.length > 0 ? (
+                {sortedTodayRecords.length >
+                    0 ? (
                     <div className="feeding-list">
-                        {sortedTodayRecords.map((record) => {
-                            const food = getFood(record.foodId);
+                        {sortedTodayRecords.map(
+                            (record) => {
+                                const food = getFood(
+                                    record.foodId,
+                                );
 
-                            return (
-                                <article
-                                    key={record.id}
-                                    className="feeding-item"
-                                >
-                                    <div className="feeding-item__time">
-                                        {formatTime(record.dateTime)}
-                                    </div>
-
-                                    <div className="feeding-item__content">
-                                        <strong>
-                                            {record.amount}{' '}
-                                            {selectedPet.targetUnit}
-                                        </strong>
-
-                                        <span>
-                                            {food?.name ??
-                                                'Bilinmeyen mama'}
-                                        </span>
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        className="icon-button"
-                                        aria-label="Öğünü düzenle"
-                                        onClick={() =>
-                                            onEditFeeding(record)
-                                        }
+                                return (
+                                    <article
+                                        key={record.id}
+                                        className="feeding-item"
                                     >
-                                        ⋯
-                                    </button>
-                                </article>
-                            );
-                        })}
+                                        <div className="feeding-item__time">
+                                            {formatTime(
+                                                record.dateTime,
+                                            )}
+                                        </div>
+
+                                        <div className="feeding-item__content">
+                                            <strong>
+                                                {record.amount}{' '}
+                                                {
+                                                    selectedPet.targetUnit
+                                                }
+                                            </strong>
+
+                                            <span>
+                                                {food?.name ??
+                                                    'Bilinmeyen mama'}
+                                            </span>
+
+                                            {record.note && (
+                                                <small>
+                                                    {record.note}
+                                                </small>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="icon-button"
+                                            aria-label="Öğünü düzenle"
+                                            onClick={() =>
+                                                onEditFeeding(
+                                                    record,
+                                                )
+                                            }
+                                        >
+                                            ⋯
+                                        </button>
+                                    </article>
+                                );
+                            },
+                        )}
                     </div>
                 ) : (
                     <div className="empty-state empty-state--small">
                         <p>
-                            {selectedPet.name} bugün henüz
-                            beslenmedi.
+                            {selectedPet.name} bugün
+                            henüz beslenmedi.
                         </p>
                     </div>
                 )}

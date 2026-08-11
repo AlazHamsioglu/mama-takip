@@ -511,3 +511,149 @@
     border-radius: 18px 18px 0 0;
   }
 }
+
+.management-page {
+  width: min(100% - 32px, 720px);
+  margin: 0 auto;
+  padding: 24px 0 110px;
+}
+
+.management-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.management-add-button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #548565;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.management-card {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #e0e6e1;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgb(31 41 51 / 4%);
+}
+
+.management-card--selected {
+  border-color: #8cb198;
+  background: #f9fcfa;
+}
+
+.management-card__main {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.management-card__icon {
+  display: flex;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #edf4ef;
+  font-size: 1.6rem;
+}
+
+.management-card__content {
+  min-width: 0;
+  flex: 1;
+}
+
+.management-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.management-card__title h2 {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+}
+
+.management-card__content p {
+  margin: 4px 0 7px;
+  color: #78827c;
+  font-size: 0.9rem;
+}
+
+.management-card__content strong {
+  color: #425149;
+  font-size: 0.9rem;
+}
+
+.selected-badge {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #e4f1e8;
+  color: #356244;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.management-card__edit {
+  min-width: 84px;
+  border: 0;
+  border-left: 1px solid #edf0ed;
+  background: #fbfcfb;
+  color: #52705c;
+  font-weight: 700;
+}
+
+.inline-action {
+  margin-top: 12px;
+  padding: 0 18px;
+}
+
+@media (min-width: 768px) {
+  .management-page {
+    padding-top: 40px;
+  }
+}
+
+@media (max-width: 520px) {
+  .management-page__header {
+    flex-direction: column;
+  }
+
+  .management-add-button {
+    width: 100%;
+  }
+
+  .management-card__edit {
+    min-width: 68px;
+    font-size: 0.78rem;
+  }
+}
+
+.field-help {
+  color: #7d8781;
+  font-size: 0.78rem;
+}

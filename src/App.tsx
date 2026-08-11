@@ -3,13 +3,13 @@ import { useState } from 'react';
 import './App.css';
 
 import { FeedingForm } from './components/FeedingForm';
+import { PetForm } from './components/PetForm';
 import { BottomNavigation } from './components/layout/BottomNavigation';
 
-import { HistoryPage } from './pages/HistoryPage';
-import { TodayPage } from './pages/TodayPage';
-
 import { FoodsPage } from './pages/FoodsPage';
+import { HistoryPage } from './pages/HistoryPage';
 import { PetsPage } from './pages/PetsPage';
+import { TodayPage } from './pages/TodayPage';
 
 import type {
   AppPage,
@@ -19,31 +19,33 @@ import type {
 } from './types';
 
 import {
+  clearSelectedPetId,
   getFeedingRecords,
   getFoods,
   getPets,
   getSelectedPetId,
   initializeStorage,
   saveFeedingRecords,
+  savePets,
   saveSelectedPetId,
 } from './utils/storage';
 
 initializeStorage();
 
 function App() {
-  const [pets] = useState<Pet[]>(() =>
-    getPets(),
+  const [pets, setPets] = useState<Pet[]>(
+    () => getPets(),
   );
 
-  const [foods] = useState<Food[]>(() =>
-    getFoods(),
+  const [foods] = useState<Food[]>(
+    () => getFoods(),
   );
 
   const [
     feedingRecords,
     setFeedingRecords,
-  ] = useState<FeedingRecord[]>(() =>
-    getFeedingRecords(),
+  ] = useState<FeedingRecord[]>(
+    () => getFeedingRecords(),
   );
 
   const [
@@ -76,6 +78,16 @@ function App() {
     editingRecord,
     setEditingRecord,
   ] = useState<FeedingRecord | null>(null);
+
+  const [
+    isPetFormOpen,
+    setIsPetFormOpen,
+  ] = useState(false);
+
+  const [
+    editingPet,
+    setEditingPet,
+  ] = useState<Pet | null>(null);
 
   function handleSelectPet(petId: string) {
     setSelectedPetId(petId);
@@ -139,6 +151,79 @@ function App() {
     setIsFeedingFormOpen(false);
   }
 
+  function handleSavePet(pet: Pet) {
+    const petExists = pets.some(
+      (item) => item.id === pet.id,
+    );
+
+    const updatedPets = petExists
+      ? pets.map((item) =>
+        item.id === pet.id
+          ? pet
+          : item,
+      )
+      : [...pets, pet];
+
+    setPets(updatedPets);
+    savePets(updatedPets);
+
+    if (!selectedPetId) {
+      setSelectedPetId(pet.id);
+      saveSelectedPetId(pet.id);
+    }
+
+    setEditingPet(null);
+    setIsPetFormOpen(false);
+  }
+
+  function handleDeletePet(petId: string) {
+    const updatedPets = pets.filter(
+      (pet) => pet.id !== petId,
+    );
+
+    const updatedRecords =
+      feedingRecords.filter(
+        (record) => record.petId !== petId,
+      );
+
+    setPets(updatedPets);
+    savePets(updatedPets);
+
+    setFeedingRecords(updatedRecords);
+    saveFeedingRecords(updatedRecords);
+
+    if (selectedPetId === petId) {
+      const nextPetId =
+        updatedPets[0]?.id ?? '';
+
+      setSelectedPetId(nextPetId);
+
+      if (nextPetId) {
+        saveSelectedPetId(nextPetId);
+      } else {
+        clearSelectedPetId();
+      }
+    }
+
+    setEditingPet(null);
+    setIsPetFormOpen(false);
+  }
+
+  function handleOpenPetForm() {
+    setEditingPet(null);
+    setIsPetFormOpen(true);
+  }
+
+  function handleEditPet(pet: Pet) {
+    setEditingPet(pet);
+    setIsPetFormOpen(true);
+  }
+
+  function handleClosePetForm() {
+    setEditingPet(null);
+    setIsPetFormOpen(false);
+  }
+
   function renderPage() {
     switch (activePage) {
       case 'history':
@@ -154,7 +239,15 @@ function App() {
         );
 
       case 'pets':
-        return <PetsPage />;
+        return (
+          <PetsPage
+            pets={pets}
+            selectedPetId={selectedPetId}
+            onSelectPet={handleSelectPet}
+            onAddPet={handleOpenPetForm}
+            onEditPet={handleEditPet}
+          />
+        );
 
       case 'foods':
         return <FoodsPage />;
@@ -168,8 +261,13 @@ function App() {
             feedingRecords={feedingRecords}
             selectedPetId={selectedPetId}
             onSelectPet={handleSelectPet}
-            onAddFeeding={handleOpenFeedingForm}
-            onEditFeeding={handleEditFeeding}
+            onAddFeeding={
+              handleOpenFeedingForm
+            }
+            onEditFeeding={
+              handleEditFeeding
+            }
+            onAddPet={handleOpenPetForm}
           />
         );
     }
@@ -178,7 +276,7 @@ function App() {
   return (
     <>
       <main className="app">
-        {selectedPetId && renderPage()}
+        {renderPage()}
       </main>
 
       <BottomNavigation
@@ -197,6 +295,17 @@ function App() {
           onSave={handleSaveFeeding}
           onDelete={handleDeleteFeeding}
           onCancel={handleCloseFeedingForm}
+        />
+      )}
+
+      {isPetFormOpen && (
+        <PetForm
+          editingPet={
+            editingPet ?? undefined
+          }
+          onSave={handleSavePet}
+          onDelete={handleDeletePet}
+          onCancel={handleClosePetForm}
         />
       )}
     </>
