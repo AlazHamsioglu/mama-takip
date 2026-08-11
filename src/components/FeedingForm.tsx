@@ -10,34 +10,51 @@ interface FeedingFormProps {
     pets: Pet[];
     foods: Food[];
     selectedPetId: string;
+    editingRecord?: FeedingRecord;
     onSave: (record: FeedingRecord) => void;
+    onDelete?: (recordId: string) => void;
     onCancel: () => void;
 }
 
-function getCurrentDate(): string {
-    const now = new Date();
-
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+function getDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(
+        date.getMonth() + 1,
+    ).padStart(2, '0');
+    const day = String(
+        date.getDate(),
+    ).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
 }
 
-function getCurrentTime(): string {
-    const now = new Date();
+function getTimeInputValue(date: Date): string {
+    const hours = String(
+        date.getHours(),
+    ).padStart(2, '0');
 
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const minutes = String(
+        date.getMinutes(),
+    ).padStart(2, '0');
 
     return `${hours}:${minutes}`;
+}
+
+function getCurrentDate(): string {
+    return getDateInputValue(new Date());
+}
+
+function getCurrentTime(): string {
+    return getTimeInputValue(new Date());
 }
 
 export function FeedingForm({
     pets,
     foods,
     selectedPetId,
+    editingRecord,
     onSave,
+    onDelete,
     onCancel,
 }: FeedingFormProps) {
     const selectedPet = pets.find(
@@ -48,14 +65,42 @@ export function FeedingForm({
         (food) => food.unit === selectedPet?.targetUnit,
     );
 
-    const [petId, setPetId] = useState(selectedPetId);
-    const [foodId, setFoodId] = useState(
-        compatibleFoods[0]?.id ?? '',
+    const editingDate = editingRecord
+        ? new Date(editingRecord.dateTime)
+        : null;
+
+    const [petId, setPetId] = useState(
+        editingRecord?.petId ?? selectedPetId,
     );
-    const [amount, setAmount] = useState('');
-    const [date, setDate] = useState(getCurrentDate);
-    const [time, setTime] = useState(getCurrentTime);
-    const [note, setNote] = useState('');
+
+    const [foodId, setFoodId] = useState(
+        editingRecord?.foodId ??
+        compatibleFoods[0]?.id ??
+        '',
+    );
+
+    const [amount, setAmount] = useState(
+        editingRecord
+            ? String(editingRecord.amount)
+            : '',
+    );
+
+    const [date, setDate] = useState(
+        editingDate
+            ? getDateInputValue(editingDate)
+            : getCurrentDate(),
+    );
+
+    const [time, setTime] = useState(
+        editingDate
+            ? getTimeInputValue(editingDate)
+            : getCurrentTime(),
+    );
+
+    const [note, setNote] = useState(
+        editingRecord?.note ?? '',
+    );
+
     const [error, setError] = useState('');
 
     const currentPet = pets.find(
@@ -124,13 +169,13 @@ export function FeedingForm({
         const now = new Date().toISOString();
 
         const record: FeedingRecord = {
-            id: crypto.randomUUID(),
+            id: editingRecord?.id ?? crypto.randomUUID(),
             petId,
             foodId,
             amount: numericAmount,
             dateTime: selectedDateTime.toISOString(),
             note: note.trim() || undefined,
-            createdAt: now,
+            createdAt: editingRecord?.createdAt ?? now,
         };
 
         onSave(record);
@@ -147,11 +192,15 @@ export function FeedingForm({
                 <div className="modal__header">
                     <div>
                         <span className="eyebrow">
-                            Yeni Öğün
+                            {editingRecord
+                                ? 'Öğünü Düzenle'
+                                : 'Yeni Öğün'}
                         </span>
 
                         <h2 id="feeding-form-title">
-                            Mama Verildi
+                            {editingRecord
+                                ? 'Öğün Bilgileri'
+                                : 'Mama Verildi'}
                         </h2>
                     </div>
 
@@ -283,6 +332,24 @@ export function FeedingForm({
                         </p>
                     )}
 
+                    {editingRecord && onDelete && (
+                        <button
+                            type="button"
+                            className="delete-button"
+                            onClick={() => {
+                                const shouldDelete = window.confirm(
+                                    'Bu öğün kaydını silmek istediğinden emin misin?',
+                                );
+
+                                if (shouldDelete) {
+                                    onDelete(editingRecord.id);
+                                }
+                            }}
+                        >
+                            Öğünü Sil
+                        </button>
+                    )}
+
                     <div className="modal__actions">
                         <button
                             type="button"
@@ -296,7 +363,9 @@ export function FeedingForm({
                             type="submit"
                             className="save-button"
                         >
-                            Öğünü Kaydet
+                            {editingRecord
+                                ? 'Değişiklikleri Kaydet'
+                                : 'Öğünü Kaydet'}
                         </button>
                     </div>
                 </form>

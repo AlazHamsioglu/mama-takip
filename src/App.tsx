@@ -62,18 +62,30 @@ function App() {
     setIsFeedingFormOpen,
   ] = useState(false);
 
+  const [
+    editingRecord,
+    setEditingRecord,
+  ] = useState<FeedingRecord | null>(null);
+
   function handleSelectPet(petId: string) {
     setSelectedPetId(petId);
     saveSelectedPetId(petId);
   }
 
-  function handleAddFeeding(
+  function handleSaveFeeding(
     record: FeedingRecord,
   ) {
-    const updatedRecords = [
-      ...feedingRecords,
-      record,
-    ];
+    const recordExists = feedingRecords.some(
+      (item) => item.id === record.id,
+    );
+
+    const updatedRecords = recordExists
+      ? feedingRecords.map((item) =>
+        item.id === record.id
+          ? record
+          : item,
+      )
+      : [...feedingRecords, record];
 
     setFeedingRecords(updatedRecords);
     saveFeedingRecords(updatedRecords);
@@ -81,6 +93,39 @@ function App() {
     setSelectedPetId(record.petId);
     saveSelectedPetId(record.petId);
 
+    setEditingRecord(null);
+    setIsFeedingFormOpen(false);
+  }
+
+  function handleEditFeeding(
+    record: FeedingRecord,
+  ) {
+    setEditingRecord(record);
+    setIsFeedingFormOpen(true);
+  }
+
+  function handleDeleteFeeding(
+    recordId: string,
+  ) {
+    const updatedRecords =
+      feedingRecords.filter(
+        (record) => record.id !== recordId,
+      );
+
+    setFeedingRecords(updatedRecords);
+    saveFeedingRecords(updatedRecords);
+
+    setEditingRecord(null);
+    setIsFeedingFormOpen(false);
+  }
+
+  function handleOpenFeedingForm() {
+    setEditingRecord(null);
+    setIsFeedingFormOpen(true);
+  }
+
+  function handleCloseFeedingForm() {
+    setEditingRecord(null);
     setIsFeedingFormOpen(false);
   }
 
@@ -94,9 +139,8 @@ function App() {
             feedingRecords={feedingRecords}
             selectedPetId={selectedPetId}
             onSelectPet={handleSelectPet}
-            onAddFeeding={() =>
-              setIsFeedingFormOpen(true)
-            }
+            onAddFeeding={handleOpenFeedingForm}
+            onEditFeeding={handleEditFeeding}
           />
         )}
       </main>
@@ -106,10 +150,12 @@ function App() {
           pets={pets}
           foods={foods}
           selectedPetId={selectedPetId}
-          onSave={handleAddFeeding}
-          onCancel={() =>
-            setIsFeedingFormOpen(false)
+          editingRecord={
+            editingRecord ?? undefined
           }
+          onSave={handleSaveFeeding}
+          onDelete={handleDeleteFeeding}
+          onCancel={handleCloseFeedingForm}
         />
       )}
     </>

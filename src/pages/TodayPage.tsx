@@ -22,6 +22,7 @@ interface TodayPageProps {
     selectedPetId: string;
     onSelectPet: (petId: string) => void;
     onAddFeeding: () => void;
+    onEditFeeding: (record: FeedingRecord) => void;
 }
 
 export function TodayPage({
@@ -31,6 +32,7 @@ export function TodayPage({
     selectedPetId,
     onSelectPet,
     onAddFeeding,
+    onEditFeeding,
 }: TodayPageProps) {
     const selectedPet = pets.find(
         (pet) => pet.id === selectedPetId,
@@ -41,8 +43,8 @@ export function TodayPage({
             <section className="empty-state">
                 <h2>Henüz evcil hayvan yok</h2>
                 <p>
-                    Beslenme takibine başlamak için bir evcil hayvan
-                    ekle.
+                    Beslenme takibine başlamak için bir evcil
+                    hayvan ekle.
                 </p>
             </section>
         );
@@ -152,6 +154,7 @@ export function TodayPage({
             <article className="summary-card">
                 <div className="summary-card__amount">
                     <strong>{consumedAmount}</strong>
+
                     <span>
                         / {selectedPet.dailyTarget}{' '}
                         {selectedPet.targetUnit}
@@ -195,6 +198,7 @@ export function TodayPage({
                         <span className="eyebrow">
                             Son Öğün
                         </span>
+
                         <h2>En son beslenme</h2>
                     </div>
                 </div>
@@ -230,6 +234,7 @@ export function TodayPage({
                         <span className="eyebrow">
                             Bugün
                         </span>
+
                         <h2>Bugünkü Öğünler</h2>
                     </div>
                 </div>
@@ -264,6 +269,9 @@ export function TodayPage({
                                         type="button"
                                         className="icon-button"
                                         aria-label="Öğünü düzenle"
+                                        onClick={() =>
+                                            onEditFeeding(record)
+                                        }
                                     >
                                         ⋯
                                     </button>
