@@ -69,3 +69,66 @@ export function getLastFeedingRecord(
                 new Date(a.dateTime).getTime(),
         )[0];
 }
+
+export function sortFeedingRecordsByNewest(
+    records: FeedingRecord[],
+): FeedingRecord[] {
+    return [...records].sort(
+        (a, b) =>
+            new Date(b.dateTime).getTime() -
+            new Date(a.dateTime).getTime(),
+    );
+}
+
+export function sortFeedingRecordsByOldest(
+    records: FeedingRecord[],
+): FeedingRecord[] {
+    return [...records].sort(
+        (a, b) =>
+            new Date(a.dateTime).getTime() -
+            new Date(b.dateTime).getTime(),
+    );
+}
+
+export function getPetFeedingRecords(
+    records: FeedingRecord[],
+    petId: string,
+): FeedingRecord[] {
+    return records.filter(
+        (record) => record.petId === petId,
+    );
+}
+
+export function getDateKey(
+    dateTime: string,
+): string {
+    const date = new Date(dateTime);
+
+    const year = date.getFullYear();
+    const month = String(
+        date.getMonth() + 1,
+    ).padStart(2, '0');
+    const day = String(
+        date.getDate(),
+    ).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+export function groupFeedingRecordsByDate(
+    records: FeedingRecord[],
+): Record<string, FeedingRecord[]> {
+    return records.reduce<
+        Record<string, FeedingRecord[]>
+    >((groups, record) => {
+        const dateKey = getDateKey(record.dateTime);
+
+        if (!groups[dateKey]) {
+            groups[dateKey] = [];
+        }
+
+        groups[dateKey].push(record);
+
+        return groups;
+    }, {});
+}

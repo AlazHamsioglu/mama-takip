@@ -11,6 +11,19 @@ function createTodayDateTime(
     return date.toISOString();
 }
 
+function createRelativeDateTime(
+    daysAgo: number,
+    hours: number,
+    minutes: number,
+): string {
+    const date = new Date();
+
+    date.setDate(date.getDate() - daysAgo);
+    date.setHours(hours, minutes, 0, 0);
+
+    return date.toISOString();
+}
+
 export const mockPets: Pet[] = [
     {
         id: 'pet-1',
@@ -74,5 +87,29 @@ export const mockFeedingRecords: FeedingRecord[] = [
         amount: 100,
         dateTime: createTodayDateTime(9, 0),
         createdAt: createTodayDateTime(9, 1),
+    },
+    {
+        id: 'feeding-4',
+        petId: 'pet-1',
+        foodId: 'food-1',
+        amount: 45,
+        dateTime: createRelativeDateTime(1, 8, 20),
+        createdAt: createRelativeDateTime(1, 8, 21),
+    },
+    {
+        id: 'feeding-5',
+        petId: 'pet-1',
+        foodId: 'food-2',
+        amount: 35,
+        dateTime: createRelativeDateTime(1, 14, 10),
+        createdAt: createRelativeDateTime(1, 14, 11),
+    },
+    {
+        id: 'feeding-6',
+        petId: 'pet-1',
+        foodId: 'food-1',
+        amount: 40,
+        dateTime: createRelativeDateTime(2, 9, 0),
+        createdAt: createRelativeDateTime(2, 9, 1),
     },
 ];

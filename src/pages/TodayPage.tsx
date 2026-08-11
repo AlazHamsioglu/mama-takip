@@ -11,6 +11,7 @@ import {
     getRemainingAmount,
     getTodayFeedingRecords,
     getTotalConsumed,
+    sortFeedingRecordsByOldest,
 } from '../utils/feeding';
 
 import { formatTime } from '../utils/date';
@@ -58,6 +59,9 @@ export function TodayPage({
     const consumedAmount =
         getTotalConsumed(todayRecords);
 
+    const sortedTodayRecords =
+        sortFeedingRecordsByOldest(todayRecords);
+
     const remainingAmount = getRemainingAmount(
         selectedPet.dailyTarget,
         consumedAmount,
@@ -86,12 +90,6 @@ export function TodayPage({
 
     const getFood = (foodId: string) =>
         foods.find((food) => food.id === foodId);
-
-    const sortedTodayRecords = [...todayRecords].sort(
-        (a, b) =>
-            new Date(a.dateTime).getTime() -
-            new Date(b.dateTime).getTime(),
-    );
 
     return (
         <section className="today-page">
