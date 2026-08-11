@@ -323,4 +323,4 @@ Projenin analiz, tasarım ve geliştirme sürecine ilişkin ek dokümanlar `docs
 
 MVP kapsamında planlanan temel özellikler tamamlanmıştır.
 
-Uygulamanın lint ve production build kontrolleri gerçekleştirilmiş ve temel kullanıcı akışları manuel olarak test edilmiştir.s
+Uygulamanın lint ve production build kontrolleri gerçekleştirilmiş ve temel kullanıcı akışları manuel olarak test edilmiştir.
