@@ -1,5 +1,16 @@
 import type { FeedingRecord, Food, Pet } from '../types';
 
+function createTodayDateTime(
+    hours: number,
+    minutes: number,
+): string {
+    const date = new Date();
+
+    date.setHours(hours, minutes, 0, 0);
+
+    return date.toISOString();
+}
+
 export const mockPets: Pet[] = [
     {
         id: 'pet-1',
@@ -44,24 +55,24 @@ export const mockFeedingRecords: FeedingRecord[] = [
         petId: 'pet-1',
         foodId: 'food-1',
         amount: 40,
-        dateTime: '2026-08-11T08:15:00.000Z',
+        dateTime: createTodayDateTime(8, 15),
         note: 'Sabah öğünü',
-        createdAt: '2026-08-11T08:15:30.000Z',
+        createdAt: createTodayDateTime(8, 16),
     },
     {
         id: 'feeding-2',
         petId: 'pet-1',
         foodId: 'food-1',
         amount: 30,
-        dateTime: '2026-08-11T13:30:00.000Z',
-        createdAt: '2026-08-11T13:30:30.000Z',
+        dateTime: createTodayDateTime(13, 30),
+        createdAt: createTodayDateTime(13, 31),
     },
     {
         id: 'feeding-3',
         petId: 'pet-2',
         foodId: 'food-1',
         amount: 100,
-        dateTime: '2026-08-11T09:00:00.000Z',
-        createdAt: '2026-08-11T09:00:30.000Z',
+        dateTime: createTodayDateTime(9, 0),
+        createdAt: createTodayDateTime(9, 1),
     },
 ];
